@@ -1,7 +1,6 @@
 import Layout from "@/app/components/Layout";
 import RootLayout from "@/app/components/rootlayout";
 import {getData} from "@/pages/api/gettariffs/index";
-import {useRouter} from "next/router";
 import Back from './backbutton';
 
 export default function Catalog ({id, data})
@@ -16,11 +15,25 @@ export default function Catalog ({id, data})
     </Layout></RootLayout>)
 }
 
+const data = getData();
+
 export async function getStaticProps(context) {
     const {id} = context.params,
-        data = getData({id});
+        itemData = data.find((i)=>i.id===id);
 
     return {
-        props:{id, data}
+        props:{id, data:itemData}
+    }
+}
+
+export const getStaticPaths = async () => {
+
+    const paths = data.map(i => ({
+        params: { id: i.id.toString() },
+    }));
+
+    return {
+        paths,
+        fallback: false
     }
 }
