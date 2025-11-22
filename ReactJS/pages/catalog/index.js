@@ -6,7 +6,7 @@ import {getData} from '@/pages/api/gettariffs/index';
 
 export default function Catalog({items}) {
     return (<RootLayout>
-        <Layout title="Catalog" description="Items list">
+        <Layout title="Каталог" description="Items list">
             <ul className="catalog"> {
                 items.map((i) => <li key={i.id}>
                     <a href={`catalog/${i.id}`}>{i.title}</a>
