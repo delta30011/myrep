@@ -26,7 +26,7 @@ export async function getStaticProps(context) {
     }
 }
 
-export const getStaticPaths = async () => {
+export async function getStaticPaths()  {
 
     const paths = data.map(i => ({
         params: { id: i.id.toString() },
