@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ag-grid-enterprise": "^34.3.1",
+    "ag-grid-vue3": "^34.3.1",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.25"
+  },
+  "scripts": {
+    "serve": "vite"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.2",
+    "vite": "^7.2.7"
+  }
+}
