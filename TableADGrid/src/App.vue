@@ -15,6 +15,8 @@
       <ag-grid-vue
           class="ag-theme-alpine"
           style="height: 500px"
+          :columnDefs="columnDefs"
+          :rowData="itemsStore.getAll"
           :gridOptions="gridOptions"
           @grid-ready="onGridReady"
           @selection-changed="onSelectionChanged"
@@ -79,9 +81,7 @@ const selectedItemId = ref(null),
       treeData: true,
       getDataPath: data => {
         return itemsStore.getPath(data.id);
-      },
-      columnDefs: columnDefs,
-      rowData: itemsStore.getAll
+      }
     };
 
 
