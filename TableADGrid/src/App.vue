@@ -131,3 +131,9 @@ interface myProps {
   items: Item[]
 }
 </script>
+
+<style lang="scss">
+  .ag-center-cols-container {
+    width: 100% !important;
+  }
+</style>
