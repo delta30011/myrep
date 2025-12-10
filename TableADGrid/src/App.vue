@@ -47,22 +47,20 @@ const selectedItemId = ref(null),
 
     onGridReady = (params) => {
       gridApi.value = params.api;
+      params.api.moveColumnByIndex(1,2);
     },
     onSelectionChanged = (params) => {
       const selectedRows = params.api.getSelectedRows();
       selectedItemId.value = (selectedRows.length) ? selectedRows[0].id : null;
     },
     columnDefs = [
-      {field: 'id', headerName: '№ п/п', cellDataType: 'text'},
+      {field: 'id', headerName: '№ п/п', cellDataType: 'text',  cellRenderer: (params) => {return (params.node.rowIndex+1)}, width:50},
       {
         headerName: 'Категория',
         cellRenderer: ({data}) => ((itemsStore.getAllChildren(data?.id).length) ? '<b>Группа</b>' : 'Элемент')
       },
       {field: 'label', headerName: 'Название'}
     ],
-    autoGroupColumnDef = ref({
-      minWidth: 200,
-    }),
     defaultColDef = ref({
       flex: 1,
       minWidth: 100,
@@ -81,7 +79,8 @@ const selectedItemId = ref(null),
       treeData: true,
       getDataPath: data => {
         return itemsStore.getPath(data.id);
-      }
+      },
+      groupDefaultExpanded: -1
     };
 
 
