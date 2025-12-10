@@ -15,11 +15,6 @@
       <ag-grid-vue
           class="ag-theme-alpine"
           style="height: 500px"
-          :columnDefs="columnDefs"
-          :rowData="itemsStore.getAll"
-          :autoGroupColumnDef="autoGroupColumnDef"
-          :defaultColDef="defaultColDef"
-          groupDisplayType="groupRows"
           :gridOptions="gridOptions"
           @grid-ready="onGridReady"
           @selection-changed="onSelectionChanged"
@@ -37,9 +32,9 @@ import {
   ModuleRegistry,
   AllCommunityModule
 } from "ag-grid-community";
-import {RowGroupingModule} from "ag-grid-enterprise";
+import {/*RowGroupingModule, */TreeDataModule} from "ag-grid-enterprise";
 
-ModuleRegistry.registerModules([AllCommunityModule, RowGroupingModule]);
+ModuleRegistry.registerModules([AllCommunityModule, /*RowGroupingModule, */TreeDataModule]);
 
 const {items} = defineProps<myProps>();
 
@@ -57,10 +52,9 @@ const selectedItemId = ref(null),
     },
     columnDefs = [
       {field: 'id', headerName: '№ п/п', cellDataType: 'text'},
-      {field: 'parent', rowGroup: true, hide: true, valueFormatter: ({value}) => 'Группа ' + (value || 'N/A')},
       {
         headerName: 'Категория',
-        valueFormatter: ({data}) => ((itemsStore.getAllChildren(data?.id).length) ? 'Группа' : 'Элемент')
+        cellRenderer: ({data}) => ((itemsStore.getAllChildren(data?.id).length) ? '<b>Группа</b>' : 'Элемент')
       },
       {field: 'label', headerName: 'Название'}
     ],
@@ -74,7 +68,20 @@ const selectedItemId = ref(null),
     gridOptions = {
       rowSelection: {
         mode: 'singleRow',
-      }
+      },
+      autoGroupColumnDef: {
+        headerName: '',
+        minWidth: 300,
+        cellRendererParams: {
+          //suppressCount: true,
+        },
+      },
+      treeData: true,
+      getDataPath: data => {
+        return itemsStore.getPath(data.id);
+      },
+      columnDefs: columnDefs,
+      rowData: itemsStore.getAll
     };
 
 

@@ -50,8 +50,25 @@ class TreeStore {
                         break;
                     }
                 }
-
                 return result;
+            }
+
+            const getPath = (id) => {
+                const result = [id+''];
+                let current = getItem(id);
+
+                while (current && current.parent !== null && current.parent !== undefined) {
+                    const parent = getItem(current.parent);
+                    if (parent) {
+                        result.push(parent.id+'');
+                        current = parent;
+                    } else {
+                        break;
+                    }
+                }
+
+                //console.log('---',id,result.reverse());
+                return result.reverse();
             }
 
             const addItem = (item) => {
@@ -110,6 +127,7 @@ class TreeStore {
                 getChildren,
                 getAllChildren,
                 getAllParents,
+                getPath,
                 addItem,
                 removeItem,
                 updateItem,
