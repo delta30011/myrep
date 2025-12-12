@@ -10,14 +10,22 @@ body {padding:1em}
     width: 500px;
     margin: 2em auto;
     position: relative;
-    border: solid 1px;
+    //border: #CCCCCC solid 1px;
 
     .placesList {
-        & > div + div {
-            margin-top: 3em;
-            border-top: 1px solid;
-            padding-top: 3em
+        & > div {
+            & + div {
+                margin-top: 3em;
+                border-top: #CCCCCC 1px solid;
+                padding-top: 3em;}
+            }
+            .icon {display: inline-block; margin-right:5px; height:15px; width:15px}
+            h3 {font-size:2em
         }
+    }
+
+    .loader {
+        position: absolute; top:0; right:0; bottom:0; left:0; background:rgba(255,255,255,0.9); display: flex; align-items: center; justify-content: center; z-index:+1
     }
 }
 

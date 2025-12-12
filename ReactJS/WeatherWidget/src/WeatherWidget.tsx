@@ -4,17 +4,14 @@ import useLocalStorage from "./UseLocalStorage.ts";
 import DragList from "./DragList.tsx";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { RabbitIcon, XIcon, SettingsIcon } from 'lucide-react';
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+    DialogTitle
 } from "@/components/ui/dialog"
+import { Spinner } from "@/components/ui/spinner"
+import { XIcon, SettingsIcon, Compass, CircleGauge } from 'lucide-react';
+
 
 interface PlaceLocation {
     long?: string
@@ -26,21 +23,12 @@ type Dir = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
 
 export default function WeatherWidget() {
     const isInit = useRef(true);
+    const [isLoading, setIsLoading] = useState(false);
 
     const [stored, setStored] = useLocalStorage('locations', []);
     const [locations, setLocations] = useState([]);
     const [newPlace, setNewPlaceVal] = useState('');
-
-    useEffect(() => {
-        if (isInit.current) {
-            isInit.current = false;
-            return;
-        }
-        setStored(locations.map((i: any) => ({title: i.title, long: i.coord.lon, latt: i.coord.lat})))
-    }, [locations]);
-
-    const [modalShow, setModalShow] = useState(true);
-
+    const [modalShow, setModalShow] = useState(false);
     const windDirections = {
         0: 'N',
         45: 'NE',
@@ -52,21 +40,34 @@ export default function WeatherWidget() {
         315: 'NW'
     }
 
+    useEffect(() => {
+        if (isInit.current) {
+            isInit.current = false;
+            return;
+        }
+        setStored(locations.map((i: any) => ({title: i.title, long: i.coord.lon, latt: i.coord.lat})))
+    }, [locations]);
+
+
+
     async function getData(location: PlaceLocation) {
+        setIsLoading(true);
         const {data} = await axios.get(`data.json`/* URL here */, {params: {...location}});
+        setIsLoading(false);
         return data;
     }
 
     async function setNewPlace(place: PlaceLocation) {
         const data = await getData(place);
-        setLocations((prev:any):any => [{title: place.title || data.name, ...data}, ...prev]);
+        setLocations((prev:any):any => [...prev, {title: place.title || data.name, ...data}]);
+        return (data)
     }
 
     useEffect(() => {
 
         if (!stored.length) {
             navigator.geolocation.getCurrentPosition(
-                async function (position) {
+                function (position) {
                     const {latitude, longitude} = position.coords;
                     console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
                     setNewPlace({latt: `${latitude}`, long: `${longitude}`});
@@ -77,19 +78,29 @@ export default function WeatherWidget() {
             );
 
         } else {
-            stored.map((place: PlaceLocation) => setNewPlace(place))
+            stored.map(async (place: PlaceLocation, i:number) => {
+                    const data = await setNewPlace(place);
+            });
         }
+
+        return(()=> {setLocations([]);  })
 
     }, [])
 
     return (
-        <div className="inline-block placesList rounded-md border shadow-md p-5 min-w-[300px] relative">
-            <Button variant="ghost" class="absolute top-5 right-5 cursor-pointer" size="icon" onClick={()=>{setModalShow(true)}}><SettingsIcon/></Button>
-            <h2 className="text-xl">WeatherWidget</h2>
+        <div className="WeatherWidget inline-block placesList rounded-md border shadow-md p-5 min-w-[300px] relative">
+
+            { isLoading && <div className="loader"><Spinner className="size-8" /></div>}
+
+            <Button variant="ghost" className="absolute top-5 right-5 cursor-pointer" size="icon" onClick={()=>{setModalShow(true)}}><SettingsIcon/></Button>
 
             <Dialog open={modalShow}>
-                <DialogContent className="sm:max-w-[425px] [&>button:last-child]:hidden" onInteractOutside={(e) => { setModalShow(false); e.preventDefault(); }}>
-
+                <DialogContent
+                    className="only sm:max-w-[425px] [&>button:last-child]:hidden"
+                    aria-describedby={undefined}
+                    onInteractOutside={(e) => { setModalShow(false); e.preventDefault(); }}
+                >
+                    <DialogTitle></DialogTitle>
                         <div className="flex justify-end"><Button variant="ghost" size="icon" className="cursor-pointer" onClick={() => {
                             setModalShow(false)}}><XIcon  /></Button></div>
 
@@ -103,15 +114,17 @@ export default function WeatherWidget() {
                 </DialogContent>
             </Dialog>
 
-            <div>
+            <h2 className="text-xl">WeatherWidget</h2>
+
+            <div className="placesList">
                 {locations.map((place: any, i: number) => (
 
                         <div key={i}>
-                            <strong>{place.name}, {place.sys.country}</strong>
+                            <strong>{place.title||place.name}, {place.sys.country}</strong>
                             <div className="flex items-center">
           <span><img src={'http://openweathermap.org/img/wn/' + place.weather[0]?.icon + '@2x.png'}
                      title={place.weather[0].description}/></span>
-                                <h3 style={{margin: 0, fontWeight: 'bold'}}>{place.main.temp}</h3>
+                                <h3 style={{margin: 0, fontWeight: 'bold'}}>{place.main.temp} <sup>o</sup></h3>
                             </div>
                             <div className="row">
                                 <div className="col-6">
@@ -119,8 +132,8 @@ export default function WeatherWidget() {
                                         {place.weather[0].description}</small></p>
                                     <p className="grid grid-cols-2">
                                         <small
-                                            className="col">{place.wind.speed}m/s {windDirections[(place.wind.deg as Dir)]}</small>
-                                        <small className="col"> {place.main.pressure}hPa </small>
+                                            className="col"><Compass className="icon" /> {place.wind.speed}m/s {windDirections[(place.wind.deg as Dir)]}</small>
+                                        <small className="col"><CircleGauge className="icon"  />  {place.main.pressure}hPa </small>
                                     </p>
                                     <p className="grid grid-cols-2">
                                         <small className="col">Humidity {place.main.humidity}%</small>
