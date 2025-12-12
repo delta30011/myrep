@@ -18,7 +18,6 @@ export default function DragList({list}) {
         setActiveItem((flag) ? num : -1);
     }
 
-
     function onDrop() {
 
         let arr = items,
@@ -48,7 +47,7 @@ export default function DragList({list}) {
     return (
         <div className="draggable" onDragOver={(e)=>e.preventDefault()} onDrop={onDrop}>
         {
-            (items || []).map((i:any, j:number) => (
+            items.length ? items.map((i:any, j:number) => (
                 <Item  key={j}
                        className="flex justify-between corners-md hover:border-[#CCCCCC] hover:shadow-md border-solid"
                        ref={(el:HTMLElement)=>(refs.current[j] = el)}
@@ -64,7 +63,7 @@ export default function DragList({list}) {
                         <CircleXIcon/>
                     </Button>
                 </Item>
-            ))
+            )) : <div className="text-center text-[#CCCCCC]">Значения отсутствуют</div>
         }</div>
     )
 }
