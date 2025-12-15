@@ -78,9 +78,17 @@ export default function WeatherWidget() {
             );
 
         } else {
-            stored.map(async (place: PlaceLocation, i:number) => {
-                    const data = await setNewPlace(place);
+            let {promise, resolve} = Promise.withResolvers();
+
+            stored.map( (place: PlaceLocation) => {
+                    promise = promise.then(async (res)=> [...res, {title: place.title, ...(await getData(place))}]);
             });
+            promise
+                .then((res) => {
+                setLocations(res);
+            })
+                .catch((e)=>{console.log(e)});
+            resolve([]);
         }
 
         return(()=> {setLocations([]);  })
