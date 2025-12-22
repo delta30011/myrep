@@ -1,8 +1,8 @@
-import {useEffect, useState, useRef} from "react";
+import {useState} from "react";
 
 interface Service {
-    id: String,
-    title: String,
+    id: string,
+    title: string,
     price: number
 }
 
@@ -16,11 +16,15 @@ export default function ServicesList() {
         {id: '005', title: 'И ещё одна услуга', price: 100},
     ];
 
-    function addToBasket(id: String) {
-        setBasket((isInBasket(id) ? basket.filter(i => i != id) : [...basket, id]));
+    function addToBasket(id: string) {
+        if (isInBasket(id)) {
+            setBasket(basket.filter(i => i != id));
+        } else {
+            setBasket([...basket, id]);
+        }
     }
 
-    function isInBasket(id: String) {
+    function isInBasket(id: string) {
         return basket.indexOf(id) > -1;
     }
 
